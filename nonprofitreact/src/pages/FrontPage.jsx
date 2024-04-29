@@ -45,17 +45,17 @@ const FrontPage = () => {
 
     }
 
+    const SendMail = (id)=>{
+        axios.post(`http://localhost:8005/api/emailrecords/`, {message:'test', nonprofit:id})
+        .then(response => {
+            console.log(response);
+            window.location.reload()
+        })
+    }
+
     return (
-        // <div>
-        //     <h1>Nonprofits</h1>
-        //     <ul>
-        //         {nonprofits.map(nonprofit => (
-        //             <li key={nonprofit.id}>{nonprofit.name}</li>
-        //         ))}
-        //     </ul>
-        // </div>
+
         <div>
-        {/* <Header3/> */}
         <div style={{paddingLeft:'3.5vw', paddingRight:'3.5vw', paddingTop:'2vh', paddingBottom:'2vh'}}>
             <h2>Temelio</h2>
             {/* <>
@@ -106,7 +106,7 @@ const FrontPage = () => {
                                 <Styledtd>{i.name}</Styledtd>
                                 <Styledtd>{i.email}</Styledtd>
                                 <Styledtd>{i.address}</Styledtd>
-                                <Styledtd>{i.msg.length>0?i.msg:<button>Send Email</button>}</Styledtd>
+                                <Styledtd>{i.msg.length>0?i.msg:<button onClick={SendMail(i.id)}>Send Email</button>}</Styledtd>
                             </tr>)
                         }):null}
                     </Styledtbody>
