@@ -30,14 +30,7 @@ const Foundation = () => {
     }
 
     return (
-        // <div>
-        //     <h1>Nonprofits</h1>
-        //     <ul>
-        //         {nonprofits.map(nonprofit => (
-        //             <li key={nonprofit.id}>{nonprofit.name}</li>
-        //         ))}
-        //     </ul>
-        // </div>
+       
         <div>
         {/* <Header3/> */}
         <div style={{paddingLeft:'3.5vw', paddingRight:'3.5vw', paddingTop:'2vh', paddingBottom:'2vh'}}>
