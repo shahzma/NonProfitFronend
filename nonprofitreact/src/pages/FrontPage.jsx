@@ -16,6 +16,7 @@ const FrontPage = () => {
         address: ''
     });
     const [isFormVisible, setFormVisible] = useState(false);
+    const [allValuesGiven,setallValuesGiven] = useState(true)
 
 
 
@@ -63,10 +64,25 @@ const FrontPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('nonlen = ',nonprofits.length )
-        setNonprofits([...nonprofits, { ...newNonprofit, id: nonprofits.length + 1, msg: '' }]);
-        setFormVisible(false);
-        setNewNonprofit({ name: '', email: '', address: '' }); // Reset form
+        if (!newNonprofit.name || !newNonprofit.email || !newNonprofit.address) {
+            alert("Please fill in all fields");
+            setallValuesGiven(false)
+            return;
+        }
+        setallValuesGiven(true)
+        axios.post(`http://0.0.0.0:8005/api/nonprofits/`, {
+            name: newNonprofit.name,
+            email: newNonprofit.email,
+            address: newNonprofit.address
+        })
+        .then(response => {
+            console.log(response);
+            setNonprofits([...nonprofits, { ...newNonprofit, id: nonprofits.length + 1, msg: '' }]);
+            setFormVisible(false);
+            setNewNonprofit({ name: '', email: '', address: '' }); // Reset form
+            // window.location.reload()
+        })
+
     };
 
     const SendMail = (id)=>{
@@ -132,20 +148,29 @@ const FrontPage = () => {
                                 <Styledtd>{i.name}</Styledtd>
                                 <Styledtd>{i.email}</Styledtd>
                                 <Styledtd>{i.address}</Styledtd>
-                                <Styledtd>{i.msg?i.msg:<button onClick={() => SendMail(i.id)}>Send Email</button>}</Styledtd>
+                                <Styledtd>{i.msg.length?i.msg:<button onClick={() => SendMail(i.id)}>Send Email</button>}</Styledtd>
                             </tr>)
                         }):null}
                         {isFormVisible && (
                         <tr>
-                            <Styledtd><input value={newNonprofit.name} onChange={handleInputChange} name="name" placeholder="Name" /></Styledtd>
-                            <Styledtd><input value={newNonprofit.email} onChange={handleInputChange} name="email" placeholder="Email" /></Styledtd>
-                            <Styledtd><input value={newNonprofit.address} onChange={handleInputChange} name="address" placeholder="Address" /></Styledtd>
+                            <Styledtd>
+                                <input value={newNonprofit.name} onChange={handleInputChange} name="name" placeholder="Name" />
+                                {newNonprofit.name === '' && !allValuesGiven?<div style={{ color: 'red' }}>Missing</div>:null}
+                            </Styledtd>
+                            <Styledtd>
+                                <input value={newNonprofit.email} onChange={handleInputChange} name="email" placeholder="Email" />
+                                {newNonprofit.email === '' && !allValuesGiven?<div style={{ color: 'red' }}>Missing</div>:null}
+                            </Styledtd>
+                            <Styledtd>
+                                <input value={newNonprofit.address} onChange={handleInputChange} name="address" placeholder="Address" />
+                                {newNonprofit.address === '' && !allValuesGiven?<div style={{ color: 'red' }}>Missing</div>:null}
+                            </Styledtd>
                             <Styledtd><button onClick={handleSubmit}>Save</button></Styledtd>
                         </tr>
                     )}
                     </Styledtbody>
                 </table>
-                <button onClick={() => setFormVisible(true)}>+ Create</button>
+                {!isFormVisible?<button onClick={() => setFormVisible(true)}>+ Create</button>:null}
             </div>
         </div>
     </div>
