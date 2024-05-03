@@ -10,13 +10,20 @@ const FrontPage = () => {
     const [nonprofits, setNonprofits] = useState([]);
     const tabeledataref = useRef(null)
     const [players, setplayers] = useState([])
+    const [newNonprofit, setNewNonprofit] = useState({
+        name: '',
+        email: '',
+        address: ''
+    });
+    const [isFormVisible, setFormVisible] = useState(false);
+
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 let response = await axios.get('http://localhost:8005/api/nonprofits/');
                 let res = await axios.get('http://localhost:8005/api/emailrecords/')
-                tabeledataref.current = response.data;
                 const uniqueNames = new Set(response.data.map(item => item.name));
                 let arr = Array.from(uniqueNames).map(name => ({ value: name, label: name }));
                 setplayers(arr);
@@ -28,6 +35,7 @@ const FrontPage = () => {
                     )
                 })
                 setNonprofits(response);
+                tabeledataref.current = response;
                 console.log('repsonse = ', response)
                 
             } catch (error) {
@@ -40,10 +48,26 @@ const FrontPage = () => {
 
 
     const handleSelectOptions  = (option) =>{
-        let arr = tabeledataref.current.filter((val)=>val.player_name===option.value)
+        console.log('option = ',option, tabeledataref.current)
+        let arr = tabeledataref.current.filter((val)=>val.name===option.value)
         setNonprofits(arr)
-
     }
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewNonprofit(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log('nonlen = ',nonprofits.length )
+        setNonprofits([...nonprofits, { ...newNonprofit, id: nonprofits.length + 1, msg: '' }]);
+        setFormVisible(false);
+        setNewNonprofit({ name: '', email: '', address: '' }); // Reset form
+    };
 
     const SendMail = (id)=>{
         axios.post(`http://localhost:8005/api/emailrecords/`, {message:'test', nonprofit:id})
@@ -91,6 +115,8 @@ const FrontPage = () => {
                         </div>
                     </div>
                 </div>
+
+
                 <table>
                     <thead>
                         <tr>
@@ -106,12 +132,20 @@ const FrontPage = () => {
                                 <Styledtd>{i.name}</Styledtd>
                                 <Styledtd>{i.email}</Styledtd>
                                 <Styledtd>{i.address}</Styledtd>
-                                <Styledtd>{i.msg.length>0?i.msg:<button onClick={SendMail(i.id)}>Send Email</button>}</Styledtd>
+                                <Styledtd>{i.msg?i.msg:<button onClick={() => SendMail(i.id)}>Send Email</button>}</Styledtd>
                             </tr>)
                         }):null}
+                        {isFormVisible && (
+                        <tr>
+                            <Styledtd><input value={newNonprofit.name} onChange={handleInputChange} name="name" placeholder="Name" /></Styledtd>
+                            <Styledtd><input value={newNonprofit.email} onChange={handleInputChange} name="email" placeholder="Email" /></Styledtd>
+                            <Styledtd><input value={newNonprofit.address} onChange={handleInputChange} name="address" placeholder="Address" /></Styledtd>
+                            <Styledtd><button onClick={handleSubmit}>Save</button></Styledtd>
+                        </tr>
+                    )}
                     </Styledtbody>
                 </table>
-                <button>+ Create</button>
+                <button onClick={() => setFormVisible(true)}>+ Create</button>
             </div>
         </div>
     </div>
